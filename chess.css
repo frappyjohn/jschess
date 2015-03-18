@@ -1,0 +1,36 @@
+body { font-family: Arial, Helvetica, sans-serif; }
+
+div { margin: 1em; }
+table {
+    border-collapse: collapse;
+}
+th { text-align: left; }
+
+table#Board td {width: 2em; height:2em; border: solid thin #888; text-align:center;}
+
+table.MovesTable {
+  display: none;
+}
+
+table.MovesTable td,th {
+    padding-left: 0.25em;
+    padding-right: 0.50em;
+    font-size: 70%;
+}
+
+div#Log {
+    font-size: 70%;
+}
+div#Log div {
+    margin: 0;
+}
+
+div#HumanMove {
+    display: block;
+}
+div#MachineMove {
+    display: none;
+}
+div#MachinesBestMove {
+    font-size: 70%;
+}

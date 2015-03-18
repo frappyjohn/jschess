@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+    <head>
+		<meta charset="utf-8">
+		<title>Chess</title> 
+        <link rel="stylesheet" href="chess.css">
+        <style>
+        </style>
+    </head>
+    <body>
+        <div >Mode is <span id='Mode' ></span> <button onclick='SwitchMode()'>Switch</button>
+        <br><span id='ManualColors' >Your color is <span id='HumanColor'></span>. Machine's color is <span id='MachineColor'> </span>. <button onclick='SwitchColors()'>Switch</button><br></span>
+        It is <span id='CurrentTurn' ></span>'s turn. <button onclick='SwitchTurns()'>Switch</button>
+        </div>
+        
+        <div style='text-align: center;' >
+            <div style='float: left;' >
+                <div id='main' ></div>
+                <div id='HumanMove' >
+                    Your move:
+                    <br><span style='font-size: 70%; font-style: italic;' >(Click on piece to move, then on square to move to.)</span>
+                    <br>From row <input id='NextRowFrom' size='1'  value='' ></input>, file <input id='NextFileFrom' size='1'  value='' ></input>,  
+                    <br>to row <input id='NextRowTo' size='1'  value='' ></input>, file <input id='NextFileTo' size='1'  value='' ></input>.
+                    <br><button type='button' onClick="MoveHumanMove()">Go</button> <button type='button' onClick="ResetHumanMove()">Reset</button>
+
+                </div>
+
+                <div id='MachineMove' >
+                    Machine to move for <span id='MachineMoveColor' ></span>:
+                    <br>Lookahead <input id='MaxDepth' size='2' value='' ></input> half-turns.
+                    <br><button type='button' onClick="Chess()">Go</button>
+                    <button type='button' onClick="ToggleTrace()">Trace</button>
+                    Trace is <span id='Trace' ></span>
+                </div>
+                
+            </div>
+            <div style='float: left;'>
+                <table id='GameMovesTable' class='MovesTable'>
+                <caption>This Game:</caption>
+                <tr>
+                <th></th>
+                <th>Piece</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Taking</th>
+                <th>Remarks</th>
+                <th>Score</th>
+                <th>Time</th>
+                </tr>
+                </table>
+            </div>
+        </div>
+        <div style="clear: both" ></div>
+        
+        <div id='MachinesBestMove' ></div>
+
+        <div>
+                <table id='MovesConsideredTable' class='MovesTable'>
+                <caption>Moves Considered:</caption>
+                <tr>
+                <th>Piece</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Taking</th>
+                <th>Remarks</th>
+                <th>Score</th>
+                <th>Time</th>
+                </tr>
+                </table>
+        </div>
+        <div id='Log'>
+        </div>
+       
+        
+    </body>
+
+	<script src="chessGlobal.js" ></script>          
+	<script src="chessHelpers.js" ></script>        
+	<script src="chess.js" ></script>
+	<script src="chessDisplay.js" ></script>
+	<script>
+        var Trace = 'Off';
+        var MANUAL = 0, AUTOPLAY = 1, Mode = MANUAL;
+        
+		var HumanColor = WHITE;
+		var MachineColor = BLACK;
+        var CurrentTurn = WHITE;
+function init() {
+
+    Board = EmptyBoard;
+    Board[3][3] = [WHITE,KNIGHT];
+    Board[4][4] = [BLACK,BISHOP];
+
+    Board = InitialBoard.slice();    
+
+    ShowMove();
+    ShowMode();
+    UpdatePlayerColors();
+}
+
+function SwitchMode() {
+    if (Mode == MANUAL) {
+        Mode = AUTOPLAY;
+        HumanColor = EMPTY;
+    } else {
+        Mode = MANUAL;
+        if (MachineColor == BLACK) {
+            HumanColor = WHITE;
+        }
+    }
+   
+    ShowMode();
+    document.getElementById('CurrentTurn').innerHTML = WriteColorName(CurrentTurn);
+    ShowPlayerArea();
+}
+        
+function ShowMode() {
+    if (Mode == MANUAL) {
+        SetElementContents('Mode','Man vs. Machine');
+        ShowElement('ManualColors');
+    } else {
+        SetElementContents('Mode','Machine vs. Machine');
+        HideElement('ManualColors');
+    }
+}
+  
+function SwitchColors() {
+    if (MachineColor == BLACK) {
+        MachineColor = WHITE;
+        HumanColor = BLACK;
+    } else {
+        MachineColor = BLACK;
+        HumanColor = WHITE;
+    }   
+    UpdatePlayerColors();
+    ShowPlayerArea();
+}
+
+function UpdatePlayerColors() {    
+    document.getElementById('HumanColor').innerHTML = ColorNames[HumanColor + 1];
+    document.getElementById('MachineColor').innerHTML = ColorNames[MachineColor + 1];
+    document.getElementById('CurrentTurn').innerHTML = WriteColorName(CurrentTurn);
+}
+
+function SwitchTurns() {
+    ElapsedTime = 0;
+    if (CurrentTurn == WHITE) {
+        CurrentTurn = BLACK;
+    } else {
+        CurrentTurn = WHITE;
+    }
+    
+    document.getElementById('CurrentTurn').innerHTML = WriteColorName(CurrentTurn);
+    ShowPlayerArea();
+}
+function ShowPlayerArea() {
+    if (CurrentTurn == HumanColor) {
+        ShowElement('HumanMove');
+        HideElement('MachineMove');
+    } else {
+        document.getElementById('MaxDepth').value = MaxDepth;
+        HideElement('HumanMove');
+        SetElementContents('MachineMoveColor',WriteColorName(CurrentTurn));
+        SetElementContents('Trace',Trace);
+        ShowElement('MachineMove');
+        //ClearTable('MovesConsideredTable');
+        ShowElement('MovesConsideredTable');
+    }
+         
+
+}
+function ResetHumanMove() {
+    SetInputValue('NextRowFrom', '');
+    SetInputValue('NextFileFrom', '');
+    SetInputValue('NextRowTo', '');
+    SetInputValue('NextFileTo', '');
+    ShowMove();
+}
+
+function ToggleTrace() {
+    if (Trace == 'On') { Trace = 'Off'; } else { Trace = 'On'; }
+    ShowPlayerArea();
+}
+		
+init();
+</script>
+	
+</html>
